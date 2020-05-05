@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import React, { useState, useEffect } from 'react';
 
 import income from '../../assets/income.svg';
@@ -39,22 +40,20 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const response = await api.get('/transactions');
+      const { data } = await api.get<Response>('/transactions');
 
-      const transactionsFormatted = response.data.transactions.map(
-        (transaction: Transaction) => ({
-          ...transactions,
-          formattedValue: formatValue(transaction.value),
-          formattedDate: new Date(transaction.created_at).toLocaleDateString(
-            'pt-br',
-          ),
-        }),
-      );
+      const transactionsFormatted = data.transactions.map(transaction => ({
+        ...transaction,
+        formattedValue: formatValue(transaction.value),
+        formattedDate: new Date(transaction.created_at).toLocaleDateString(
+          'pt-br',
+        ),
+      }));
 
       const balanceFormatted = {
-        income: formatValue(response.data.balance.income),
-        outcome: formatValue(response.data.balance.outcome),
-        total: formatValue(response.data.balance.total),
+        income: formatValue(parseInt(data.balance.income)),
+        outcome: formatValue(parseInt(data.balance.outcome)),
+        total: formatValue(parseInt(data.balance.total)),
       };
 
       setTransactions(transactionsFormatted);
